@@ -53,8 +53,8 @@ fetchDataExamples();
 ### 计算技术指标
 
 ```typescript
-import { get_price, MA, BOLL, StockData } from 'ashare-sdk-ts'; // 导入所需函数和类型
-
+import { get_price, BOLL, StockData } from 'ashare-sdk-ts'; // 从安装的包导入主入口函数
+import { MA } from 'ashare-sdk-ts/dist/utils'; // 从包的 utils 模块导入 MA
 async function calculateIndicators() {
   try {
     // 1. 获取足够的数据用于计算指标 (例如，获取最近120条日线数据)
