@@ -1,7 +1,8 @@
 // Ashare 数据获取函数
 
 import axios from 'axios';
-import { StockData } from './types';
+import * as cheerio from 'cheerio'; // 新增导入 cheerio
+import { StockData, StockInfo } from './types'; // 新增导入 StockInfo
 
 /**
  * 获取腾讯日线/周线/月线数据
@@ -137,4 +138,65 @@ export async function get_price_sina(code: string, end_date: string = '', count:
         console.error('获取新浪数据失败:', error);
         return [];
     }
+}
+
+/**
+ * 获取所有股票代码和名称 (数据来源: https://quote.stockstar.com/stock/stock_index.htm)
+ * @returns 包含股票代码和名称的对象数组 Promise<StockInfo[]>
+ */
+export async function get_all_stocks(): Promise<StockInfo[]> {
+  const targetUrl = 'https://quote.stockstar.com/stock/stock_index.htm'; // 硬编码 URL
+  try {
+    // 1. 获取 HTML 内容
+    const response = await axios.get(targetUrl, { // 使用 targetUrl
+        // 模拟浏览器请求头，防止被目标网站屏蔽
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+        }
+    });
+    const htmlContent = response.data;
+
+    // 2. 加载 HTML 内容
+    const $ = cheerio.load(htmlContent);
+
+    // 3. 提取股票信息
+    const allStocks: StockInfo[] = [];
+    // 遍历可能的父容器 ID (index_data_0 到 index_data_5)
+    for (let i = 0; i < 6; i++) {
+      const parentSelector = `#index_data_${i} > li`; // 使用正确的 CSS 选择器语法
+      $(parentSelector).each((_, element) => {
+        const li = $(element);
+        // 提取代码 (在 span > a 中)
+        const codeElement = li.find('span > a');
+        const code = codeElement.text().trim();
+
+        // 提取名称 (直接在 li 下的 a 中)
+        const nameElement = li.find('> a'); // 直接子元素 a
+        let name = nameElement.text().trim();
+
+        // 验证并添加
+        if (code && name) { // 使用正确的逻辑与 &&
+          allStocks.push({ code, name });
+        } else if (code) { // 如果只找到代码，尝试备选名称查找
+            const fallbackNameElement = li.find('a').first(); // 查找 li 下第一个 a
+            const fallbackName = fallbackNameElement.text().trim();
+            // 确保备选名称不是代码本身
+            if (fallbackName && fallbackName !== code) {
+                 name = fallbackName;
+                 allStocks.push({ code, name });
+            } else {
+                 console.warn(`未能从元素提取有效的名称 (代码: ${code}): ${li.html()}`);
+            }
+        } else {
+            console.warn(`未能从元素提取有效的代码或名称: ${li.html()}`);
+        }
+      });
+    }
+
+    return allStocks;
+
+  } catch (error) {
+    console.error(`从 URL 获取股票列表失败 (${targetUrl}):`, error); // 使用 targetUrl
+    return []; // 返回空数组表示失败
+  }
 }

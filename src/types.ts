@@ -9,3 +9,8 @@ export interface StockData {
 }
 
 // TODO: 添加技术指标结果接口
+// 定义股票基本信息接口
+export interface StockInfo {
+  code: string; // 股票代码
+  name: string; // 股票名称
+}

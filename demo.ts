@@ -1,7 +1,7 @@
 // Ashare SDK TypeScript Demo
 // 导入 Ashare SDK 函数
-import { get_price, BOLL, StockData } from 'ashare-sdk-ts'; // 从安装的包导入主入口函数
-import { MA } from 'ashare-sdk-ts/dist/utils'; // 从包的 utils 模块导入 MA
+import { get_price, BOLL, StockData } from './dist'; // 从安装的包导入主入口函数
+import { MA } from './dist/utils'; // 从包的 utils 模块导入 MA
 
 // 辅助函数：打印数据摘要
 function printDataSummary(title: string, data: StockData[] | number[] | [number[], number[], number[]] | [number[], number[]]) {

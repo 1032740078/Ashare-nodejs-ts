@@ -31,10 +31,12 @@
     "ashare-sdk-ts": "^1.0.2",
     "jest": "^29.7.0",
     "ts-jest": "^29.3.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@types/cheerio": "latest"
   },
   "dependencies": {
-    "axios": "^1.9.0"
+    "axios": "^1.9.0",
+    "cheerio": "^1.0.0-rc.12"
   },
   "jest": {
     "preset": "ts-jest",

@@ -1,12 +1,16 @@
 // 单元测试
 
+// import axios from 'axios'; // 移除 axios 导入
 import { RD, RET, ABS, MAX, MIN, MA, REF, DIFF, STD, IF, SUM, HHV, LLV, EMA, SMA, AVEDEV, SLOPE, FORCAST, CROSS, COUNT, EVERY, LAST, EXIST, BARSLAST } from '../src/utils';
 import { MACD, KDJ, RSI, WR, BIAS, BOLL, PSY, CCI, ATR, BBI, DMI, TAQ, TRIX, VR, EMV, DPO, BRAR, DMA, MTM, ROC } from '../src/indicators';
-import { get_price } from '../src/index';
-import { StockData } from '../src/types';
+import { get_price, get_all_stocks } from '../src/index'; // 修改为导入 get_all_stocks
+import { StockData, StockInfo } from '../src/types'; // 导入 StockInfo
+
+// jest.mock('axios'); // 移除 mock
 
 // 测试 utils.ts 中的核心工具函数
 describe('Utils Functions', () => {
+  // ... (existing utils tests remain unchanged) ...
   test('RD should round a number to specified decimal places', () => {
     expect(RD(123.456789, 2)).toBe(123.46);
     expect(RD(123.456789)).toBe(123.457);
@@ -159,6 +163,30 @@ describe('Indicators Functions', () => {
 
 // 测试 data.ts 中的数据获取函数
 describe('Data Functions', () => {
+
+  test('get_all_stocks should fetch and parse real data', async () => { // 修改测试描述
+    jest.setTimeout(30000); // 增加超时时间到 30 秒
+
+    // 调用目标函数
+    const result = await get_all_stocks(); // 修改函数调用
+
+    // 断言结果是数组
+    expect(Array.isArray(result)).toBe(true);
+    // 断言数组长度大于 0 (假设页面总是有数据)
+    expect(result.length).toBeGreaterThan(0);
+    // 断言第一个元素包含 code 和 name 属性，且为非空字符串
+    if (result.length > 0) {
+      expect(result[0]).toHaveProperty('code');
+      expect(result[0]).toHaveProperty('name');
+      expect(typeof result[0].code).toBe('string');
+      expect(typeof result[0].name).toBe('string');
+      expect(result[0].code.length).toBeGreaterThan(0);
+      expect(result[0].name.length).toBeGreaterThan(0);
+    }
+  });
+
+  // 移除 axios 错误处理的测试用例
+
   // TODO: 为 get_price_day_tx, get_price_min_tx, get_price_sina 添加测试
   // 这些测试可能需要 mock axios 来模拟网络请求和响应
   // 可以使用 jest.mock('axios') 来 mock axios

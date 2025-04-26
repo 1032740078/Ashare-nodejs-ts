@@ -12,7 +12,5 @@
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts",
-    "test-data.ts",
-    "demo.ts" // 添加 demo.ts 到编译列表
   ]
 }

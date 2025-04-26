@@ -1,6 +1,6 @@
 // Ashare SDK 入口文件
 
-import { get_price_day_tx, get_price_min_tx, get_price_sina } from './data';
+import { get_price_day_tx, get_price_min_tx, get_price_sina, get_all_stocks } from './data'; // 修改为导入 get_all_stocks
 import { StockData } from './types';
 
 /**
@@ -44,6 +44,9 @@ export async function get_price(code: string, end_date: string = '', count: numb
   console.error('不支持的频率:', frequency);
   return [];
 }
+
+// 导出获取所有股票列表函数
+export { get_all_stocks }; // 修改为导出 get_all_stocks
 
 // 导出技术指标函数
 export * from './indicators';
