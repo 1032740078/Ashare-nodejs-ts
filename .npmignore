@@ -1,0 +1,21 @@
+# 源代码目录 (编译后的代码在 dist/ 中)
+src/
+
+# 测试文件和目录
+tests/
+test-data.ts
+
+# 示例文件
+demo.ts
+
+# TypeScript 配置文件
+tsconfig.json
+
+# Git 忽略文件 (npm 会默认包含它，但通常不需要发布)
+.gitignore
+
+# 包锁定文件 (用户安装时会生成自己的)
+package-lock.json
+
+# IDE 配置
+.idea/

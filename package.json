@@ -4,12 +4,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build": "npx tsc",
     "test": "npx tsc && jest"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["ashare", "stock", "market", "data", "sdk", "typescript", "nodejs", "quant", "finance", "股票", "行情", "量化", "金融"],
+  "author": "Robin <1032740078@qq.com>",
   "license": "ISC",
-  "description": "",
+  "description": "中国股市A股股票行情实时数据SDK (TypeScript/Node.js)，包含日线、分时分钟线，技术指标计算等功能。",
   "devDependencies": {
     "@types/axios": "^0.14.4",
     "@types/jest": "^29.5.14",

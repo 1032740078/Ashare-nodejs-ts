@@ -1,13 +1,19 @@
 # Ashare SDK (TypeScript)
 
-这是一个将 Python 的 Ashare 项目转换为 TypeScript SDK 的项目。它提供了获取股票行情数据和计算技术指标的功能。
+中国股市A股股票行情实时数据最简封装API接口，包含日线、分时分钟线，全部格式成DataFrame格式数据，可用于研究、量化分析，证券股票程序化自动化交易系统行情系统包括新浪腾讯双数据核心，自动故障切换，为量化在数据获取方面极大地减少工作量，更加专注于策略和模型的研究与实现。
+
+
+
+python原项目地址:https://github.com/mpquant/Ashare
+
+感谢原项目的Ashare作者
 
 ## 安装
 
 使用 npm 安装 SDK：
 
 ```bash
-npm install Ashare-nodejs-ts
+npm install ashare-sdk-ts
 ```
 
 ## 使用方法
@@ -15,46 +21,75 @@ npm install Ashare-nodejs-ts
 ### 获取股票行情数据
 
 ```typescript
-import { get_price } from 'Ashare-nodejs-ts';
+import { get_price } from 'ashare-sdk-ts';
 
-async function fetchData() {
+async function fetchDataExamples() {
   try {
-    // 获取某股票的日线数据
-    const dayPrice = await get_price('sh000001', '', 1, '1d');
-    console.log('上证指数日线数据:', dayPrice);
+    // 示例 1: 获取上证指数日线数据 (使用默认参数: count=10, frequency='1d')
+    const shIndexDefault = await get_price('sh000001');
+    console.log('上证指数日线 (默认):', shIndexDefault.slice(0, 3)); // 打印前3条
 
-    // 获取某股票的分钟线数据
-    const minPrice = await get_price('sh000001', '', 1, '1m');
-    console.log('上证指数分钟线数据:', minPrice);
+    // 示例 2: 获取上证指数日线数据 (指定 count=5)
+    const shIndex5 = await get_price('sh000001', '', 5);
+    console.log('上证指数日线 (count=5):', shIndex5);
+
+    // 示例 3: 获取上证指数历史日线数据 (指定 end_date 和 count)
+    // 注意: end_date 仅对 '1d', '1w', '1M' 有效
+    const shIndexHist = await get_price('000001.XSHG', '2023-12-31', 5, '1d');
+    console.log('上证指数历史日线 (end_date="2023-12-31", count=5):', shIndexHist);
+
+    // 示例 4: 获取贵州茅台15分钟线数据 (指定 count=5, frequency='15m')
+    const kweiChow15m = await get_price('sh600519', '', 5, '15m');
+    console.log('贵州茅台15分钟线 (count=5):', kweiChow15m.slice(0, 3)); // 打印前3条
 
   } catch (error) {
-    console.error('获取数据失败:', error);
+    console.error('获取数据时发生错误:', error);
   }
 }
 
-fetchData();
+fetchDataExamples();
 ```
 
 ### 计算技术指标
 
 ```typescript
-import { MA, EMA, MACD } from 'Ashare-nodejs-ts';
+import { get_price, MA, BOLL, StockData } from 'ashare-sdk-ts'; // 导入所需函数和类型
 
-const data = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+async function calculateIndicators() {
+  try {
+    // 1. 获取足够的数据用于计算指标 (例如，获取最近120条日线数据)
+    const stockHistory: StockData[] = await get_price('000001.XSHG', '', 120, '1d');
 
-// 计算 5 日均线
-const ma5 = MA(data, 5);
-console.log('5日均线:', ma5);
+    if (stockHistory.length > 0) {
+      // 2. 从获取的数据中提取所需序列 (例如，收盘价)
+      const closePrices = stockHistory.map(item => item.close);
 
-// 计算 10 日指数移动平均线
-const ema10 = EMA(data, 10);
-console.log('10日指数移动平均线:', ema10);
+      // 3. 使用提取的序列计算指标
+      // 计算 MA5 和 MA10
+      const ma5 = MA(closePrices, 5);
+      const ma10 = MA(closePrices, 10);
+      console.log('MA5 (最后5条):', ma5.slice(-5).map(v => v?.toFixed(2)));
+      console.log('MA10 (最后5条):', ma10.slice(-5).map(v => v?.toFixed(2)));
 
-// 计算 MACD (示例参数)
-// 注意：MACD 函数需要 OHLC 数据，这里仅为示例
-// const ohlcData = [...]; // 你的 OHLC 数据
-// const macdResult = MACD(ohlcData.close, 12, 26, 9);
-// console.log('MACD:', macdResult);
+      // 计算 BOLL 指标 (默认 N=20)
+      const [bollUp, bollMid, bollLower] = BOLL(closePrices);
+      console.log('BOLL Upper (最后5条):', bollUp.slice(-5).map(v => v?.toFixed(2)));
+      console.log('BOLL Mid (最后5条):', bollMid.slice(-5).map(v => v?.toFixed(2)));
+      console.log('BOLL Lower (最后5条):', bollLower.slice(-5).map(v => v?.toFixed(2)));
+
+      // 其他指标计算类似...
+      // const kdjResult = KDJ(stockHistory.map(i=>i.close), stockHistory.map(i=>i.high), stockHistory.map(i=>i.low));
+      // console.log('KDJ K (最后5条):', kdjResult.K.slice(-5).map(v => v?.toFixed(2)));
+
+    } else {
+      console.log('未能获取足够的历史数据来计算指标。');
+    }
+  } catch (error) {
+    console.error('计算指标时发生错误:', error);
+  }
+}
+
+calculateIndicators();
 ```
 
 ## API 文档
