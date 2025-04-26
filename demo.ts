@@ -1,7 +1,7 @@
 // Ashare SDK TypeScript Demo
 // 导入 Ashare SDK 函数
-import { get_price, BOLL, StockData } from './dist'; // 从安装的包导入主入口函数
-import { MA } from './dist/utils'; // 从包的 utils 模块导入 MA
+import { get_price, BOLL, StockData, get_all_stocks, StockInfo } from './src'; // 从源代码导入主入口函数
+import { MA } from './src/utils'; // 从源代码的 utils 模块导入 MA
 
 // 辅助函数：打印数据摘要
 function printDataSummary(title: string, data: StockData[] | number[] | [number[], number[], number[]] | [number[], number[]]) {
@@ -92,6 +92,25 @@ async function runDemo() {
   } else {
     console.log('\n无法计算指标，因为未能获取到足够的行情数据。');
   }
+
+  // --- 获取所有股票列表 ---
+  console.log('\n正在获取所有股票列表...');
+  const allStocks: StockInfo[] = await get_all_stocks();
+
+  if (allStocks.length > 0) {
+    console.log('\n--- 获取所有股票列表 ---');
+    console.log('获取到的股票总数:', allStocks.length);
+    console.log('前 5 只股票:');
+    console.table(allStocks.slice(0, 5));
+    if (allStocks.length > 5) {
+      console.log('后 5 只股票:');
+      console.table(allStocks.slice(-5));
+    }
+    console.log('--- End ---');
+  } else {
+    console.log('\n未能获取到股票列表数据。');
+  }
+
 
   console.log('\nAshare SDK TypeScript Demo 运行结束。');
 }

@@ -52,6 +52,7 @@ exports.get_price_sina = get_price_sina;
 exports.get_all_stocks = get_all_stocks;
 const axios_1 = __importDefault(require("axios"));
 const cheerio = __importStar(require("cheerio")); // 新增导入 cheerio
+const iconv_lite_1 = __importDefault(require("iconv-lite")); // 导入 iconv-lite 用于解码
 /**
  * 获取腾讯日线/周线/月线数据
  * @param code 股票代码
@@ -184,15 +185,17 @@ function get_all_stocks() {
     return __awaiter(this, void 0, void 0, function* () {
         const targetUrl = 'https://quote.stockstar.com/stock/stock_index.htm'; // 硬编码 URL
         try {
-            // 1. 获取 HTML 内容
+            // 1. 获取 HTML 内容 (指定返回类型为 arraybuffer 以便手动解码)
             const response = yield axios_1.default.get(targetUrl, {
+                responseType: 'arraybuffer', // 获取原始二进制数据
                 // 模拟浏览器请求头，防止被目标网站屏蔽
                 headers: {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
                 }
             });
-            const htmlContent = response.data;
-            // 2. 加载 HTML 内容
+            // 使用 iconv-lite 将 GBK 编码的 Buffer 解码为 UTF-8 字符串
+            const htmlContent = iconv_lite_1.default.decode(response.data, 'gbk');
+            // 2. 加载正确解码后的 HTML 内容
             const $ = cheerio.load(htmlContent);
             // 3. 提取股票信息
             const allStocks = [];

@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio'; // 新增导入 cheerio
+import iconv from 'iconv-lite'; // 导入 iconv-lite 用于解码
 import { StockData, StockInfo } from './types'; // 新增导入 StockInfo
 
 /**
@@ -147,16 +148,18 @@ export async function get_price_sina(code: string, end_date: string = '', count:
 export async function get_all_stocks(): Promise<StockInfo[]> {
   const targetUrl = 'https://quote.stockstar.com/stock/stock_index.htm'; // 硬编码 URL
   try {
-    // 1. 获取 HTML 内容
+    // 1. 获取 HTML 内容 (指定返回类型为 arraybuffer 以便手动解码)
     const response = await axios.get(targetUrl, { // 使用 targetUrl
+        responseType: 'arraybuffer', // 获取原始二进制数据
         // 模拟浏览器请求头，防止被目标网站屏蔽
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
         }
     });
-    const htmlContent = response.data;
+    // 使用 iconv-lite 将 GBK 编码的 Buffer 解码为 UTF-8 字符串
+    const htmlContent = iconv.decode(response.data, 'gbk');
 
-    // 2. 加载 HTML 内容
+    // 2. 加载正确解码后的 HTML 内容
     const $ = cheerio.load(htmlContent);
 
     // 3. 提取股票信息

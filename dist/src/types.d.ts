@@ -6,3 +6,7 @@ export interface StockData {
     low: number;
     volume: number;
 }
+export interface StockInfo {
+    code: string;
+    name: string;
+}

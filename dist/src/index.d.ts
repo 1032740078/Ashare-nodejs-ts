@@ -1,3 +1,4 @@
+import { get_all_stocks } from './data';
 import { StockData } from './types';
 /**
  * 获取股票行情数据
@@ -8,5 +9,6 @@ import { StockData } from './types';
  * @returns 股票数据序列
  */
 export declare function get_price(code: string, end_date?: string, count?: number, frequency?: '1d' | '1w' | '1M' | '1m' | '5m' | '15m' | '30m' | '60m'): Promise<StockData[]>;
+export { get_all_stocks };
 export * from './indicators';
 export * from './types';
